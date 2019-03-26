@@ -1,0 +1,50 @@
+syntax = "proto3";
+option java_package = "org.wallet.walletdata.proto";
+package org.wallet;
+
+service Wallet {
+    rpc Deposit (DepositRequest) returns (DepositResponse) {}
+    rpc Withdraw (WithdrawRequest) returns (WithdrawResponse) {}
+    rpc Balance (BalanceRequest) returns (BalanceResponse) {}
+}
+
+message DepositRequest {
+    int64 userId = 1;
+    BDecimal amount = 2;
+    Currency currency = 3;
+}
+
+message DepositResponse {
+}
+
+message WithdrawRequest {
+     int64 userId = 1;
+     BDecimal amount = 2;
+     Currency currency = 3;
+}
+
+message WithdrawResponse{
+}
+
+message BalanceRequest {
+    int64 userId = 1;
+}
+
+message BalanceResponse {
+    map<string, BDecimal> balance = 3;
+}
+
+enum Currency {
+    EUR = 0 ;
+    USD = 1 ;
+    GBP = 2 ;
+}
+
+message BDecimal {
+    int32 scale = 1;
+    BInteger int_val = 2;
+}
+
+message BInteger {
+    bytes value = 1;
+}

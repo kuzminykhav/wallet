@@ -1,0 +1,21 @@
+plugins {
+}
+
+apply plugin: 'io.spring.dependency-management'
+apply plugin: 'org.springframework.boot'
+
+group = 'org.wallet'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '8'
+
+dependencies {
+	compile project(':wallet-data')
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	runtimeOnly 'org.springframework.boot:spring-boot-devtools'
+	runtimeOnly group: 'com.h2database', name: 'h2', version: '1.4.199'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+
+
+
