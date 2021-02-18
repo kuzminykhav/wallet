@@ -1,5 +1,7 @@
 package org.wallet.walletserver.services.jpa;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.wallet.walletdata.model.*;
 import org.wallet.walletserver.services.exceptions.InsufficientFundsException;
@@ -10,18 +12,14 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Optional;
 
+@RequiredArgsConstructor
 @Service
+@Slf4j
 public class TransactionServiceImpl implements TransactionService {
 
     private final TransactionRepository transactionRepository;
-    private UserService userService;
-    private WalletService walletService;
-
-    public TransactionServiceImpl(TransactionRepository transactionRepository, UserService userService, WalletService walletService) {
-        this.transactionRepository = transactionRepository;
-        this.userService = userService;
-        this.walletService = walletService;
-    }
+    private final UserService userService;
+    private final WalletService walletService;
 
     @Override
     @Transactional

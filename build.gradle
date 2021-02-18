@@ -23,6 +23,10 @@ subprojects {
 		compile 'io.grpc:grpc-netty-shaded:1.19.0'
 		compile 'io.grpc:grpc-protobuf:1.19.0'
 		compile 'io.grpc:grpc-stub:1.19.0'
+		compileOnly 'org.projectlombok:lombok:1.18.16'
+		annotationProcessor 'org.projectlombok:lombok:1.18.16'
+		testCompileOnly 'org.projectlombok:lombok:1.18.16'
+		testAnnotationProcessor 'org.projectlombok:lombok:1.18.16'
 	}
 }
 

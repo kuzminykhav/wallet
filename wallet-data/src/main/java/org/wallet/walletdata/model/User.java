@@ -1,10 +1,17 @@
 package org.wallet.walletdata.model;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
 @Table(name = "users")
 public class User {
 
@@ -23,9 +30,6 @@ public class User {
             mappedBy = "user")
     private Set<Transaction> transactions = new HashSet<>();
 
-    public User() {
-    }
-
     public User(String name) {
         this.name = name;
     }
@@ -35,27 +39,4 @@ public class User {
         this.name = name;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Set<Wallet> getWallets() {
-        return wallets;
-    }
-
-    public void setWallets(Set<Wallet> wallets) {
-        this.wallets = wallets;
-    }
-
-    public Set<Transaction> getTransactions() {
-        return transactions;
-    }
-
-    public void setTransactions(Set<Transaction> transactions) {
-        this.transactions = transactions;
-    }
 }

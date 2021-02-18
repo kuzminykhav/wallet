@@ -1,5 +1,6 @@
 package org.wallet.walletserver.services.jpa;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.wallet.walletdata.model.*;
 import org.wallet.walletdata.repositories.WalletRepository;
@@ -7,16 +8,13 @@ import org.wallet.walletdata.repositories.WalletRepository;
 import java.util.ArrayList;
 import java.util.List;
 
+@RequiredArgsConstructor
 @Service
 public class WalletServiceImpl implements WalletService {
 
     private final WalletRepository walletRepository;
-    private UserService userService;
+    private final UserService userService;
 
-    public WalletServiceImpl(WalletRepository walletRepository, UserService userService) {
-        this.walletRepository = walletRepository;
-        this.userService = userService;
-    }
 
     @Override
     public Wallet findWallet(Long userId, Currency currency) {
