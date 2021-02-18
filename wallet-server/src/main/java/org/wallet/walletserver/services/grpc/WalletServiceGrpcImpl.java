@@ -1,5 +1,6 @@
 package org.wallet.walletserver.services.grpc;
 
+import com.google.protobuf.ByteString;
 import io.grpc.BindableService;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +11,7 @@ import org.wallet.walletdata.proto.WalletOuterClass;
 import org.wallet.walletserver.services.jpa.TransactionService;
 
 import java.math.BigDecimal;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -19,30 +21,50 @@ public class WalletServiceGrpcImpl extends org.wallet.walletdata.proto.WalletGrp
     private final TransactionService transactionService;
 
     @Override
-    public void deposit(org.wallet.walletdata.proto.WalletOuterClass.DepositRequest request, StreamObserver<WalletOuterClass.DepositResponse> responseObserver) {
-        log.debug("Request {}",request);
-        transactionService.depositTransaction(request.getUserId(),BigDecimal.valueOf(1L), Currency.valueOf(request.getCurrency().name()));
-
-        log.debug("Response {1}",responseObserver);
-        super.deposit(request, responseObserver);
+    public void deposit(WalletOuterClass.DepositRequest request, StreamObserver<WalletOuterClass.DepositResponse> responseObserver) {
+        transactionService.depositTransaction(request.getUserId(),
+                new BigDecimal(new java.math.BigInteger(
+                        request.getAmount().getIntVal().getValue().toByteArray()),
+                        request.getAmount().getScale()),
+                Currency.valueOf(request.getCurrency().name()));
+        WalletOuterClass.DepositResponse response = WalletOuterClass.DepositResponse.newBuilder().build();
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
     }
 
     @Override
-    public void withdraw(org.wallet.walletdata.proto.WalletOuterClass.WithdrawRequest request, StreamObserver<WalletOuterClass.WithdrawResponse> responseObserver) {
-        log.debug("Request {}",request);
-
-
-        log.debug("Response {}",responseObserver);
-        super.withdraw(request, responseObserver);
+    public void withdraw(WalletOuterClass.WithdrawRequest request, StreamObserver<WalletOuterClass.WithdrawResponse> responseObserver) {
+        transactionService.withdrawTransaction(request.getUserId(),
+                new BigDecimal(new java.math.BigInteger(
+                        request.getAmount().getIntVal().getValue().toByteArray()),
+                        request.getAmount().getScale()),
+                Currency.valueOf(request.getCurrency().name()));
+        WalletOuterClass.WithdrawResponse response = WalletOuterClass.WithdrawResponse.newBuilder()
+                .build();
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
     }
 
     @Override
-    public void balance(org.wallet.walletdata.proto.WalletOuterClass.BalanceRequest request, StreamObserver<WalletOuterClass.BalanceResponse> responseObserver) {
-        log.debug("Request {}",request);
+    public void balance(WalletOuterClass.BalanceRequest request, StreamObserver<WalletOuterClass.BalanceResponse> responseObserver) {
 
-
-        log.debug("Response {}",responseObserver);
-        super.balance(request, responseObserver);
+        WalletOuterClass.BalanceResponse response = WalletOuterClass.BalanceResponse.newBuilder()
+                .putAllBalance(transactionService.getBalance(request.getUserId()).getBalance()
+                        .entrySet()
+                        .stream()
+                        .collect(Collectors.toMap(
+                                e -> e.getKey().name(),
+                                e -> WalletOuterClass.BDecimal.newBuilder()
+                                        .setScale(e.getValue().scale())
+                                        .setIntVal(
+                                                WalletOuterClass.BInteger.newBuilder()
+                                                        .setValue(ByteString.copyFrom(e.getValue().unscaledValue().toByteArray()))
+                                                        .build()
+                                        )
+                                        .build())))
+                .build();
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
     }
 
 }

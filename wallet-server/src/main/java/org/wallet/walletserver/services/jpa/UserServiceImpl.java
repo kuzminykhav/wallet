@@ -2,7 +2,6 @@ package org.wallet.walletserver.services.jpa;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.wallet.walletserver.services.exceptions.UserNotFoundException;
 import org.wallet.walletdata.model.User;
 import org.wallet.walletdata.repositories.UserRepository;
 
