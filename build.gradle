@@ -1,7 +1,7 @@
 plugins {
 	id 'java'
 	id 'base'
-	id 'org.springframework.boot' version '2.2.0.BUILD-SNAPSHOT'
+	id 'org.springframework.boot' version '2.4.3'
 }
 
 apply plugin: 'base'
@@ -20,13 +20,16 @@ subprojects {
 	dependencies {
 		compile 'org.springframework.boot:spring-boot-starter-data-jpa'
 		compile 'org.springframework.boot:spring-boot-starter-web'
-		compile 'io.grpc:grpc-netty-shaded:1.19.0'
-		compile 'io.grpc:grpc-protobuf:1.19.0'
-		compile 'io.grpc:grpc-stub:1.19.0'
+		compile 'io.grpc:grpc-netty-shaded:1.35.0'
+		compile 'io.grpc:grpc-protobuf:1.35.0'
+		compile 'io.grpc:grpc-stub:1.35.0'
 		compileOnly 'org.projectlombok:lombok:1.18.16'
 		annotationProcessor 'org.projectlombok:lombok:1.18.16'
 		testCompileOnly 'org.projectlombok:lombok:1.18.16'
 		testAnnotationProcessor 'org.projectlombok:lombok:1.18.16'
+	}
+	test {
+		useJUnitPlatform()
 	}
 }
 

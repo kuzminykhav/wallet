@@ -1,10 +1,10 @@
 package org.wallet.walletserver.services;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.wallet.walletdata.model.User;
 import org.wallet.walletdata.repositories.UserRepository;
 import org.wallet.walletserver.services.exceptions.UserNotFoundException;
@@ -13,16 +13,17 @@ import org.wallet.walletserver.services.jpa.UserServiceImpl;
 
 import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 public class UserServiceTest {
 
     @Mock
     private UserRepository userRepository;
 
-    @Before
+    @BeforeEach
     public void setup() {
         User user = new User("testUser");
         user.setId(1L);
@@ -37,12 +38,12 @@ public class UserServiceTest {
 
         User foundUser = userService.getUser(1L);
 
-        assertEquals(foundUser.getName(),"testUser");
+        assertEquals(foundUser.getName(), "testUser");
     }
 
-    @Test(expected=UserNotFoundException.class)
+    @Test
     public void whenFindUserById2_thenThrowException() {
         UserService userService = new UserServiceImpl(userRepository);
-        userService.getUser(2L);
+        assertThrows(UserNotFoundException.class, () -> userService.getUser(2L));
     }
 }

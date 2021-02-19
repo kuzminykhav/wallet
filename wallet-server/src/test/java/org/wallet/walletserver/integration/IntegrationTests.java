@@ -1,13 +1,12 @@
 package org.wallet.walletserver.integration;
 
-import org.junit.Before;
-import org.junit.FixMethodOrder;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.MethodSorters;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.wallet.walletdata.model.*;
 import org.wallet.walletdata.repositories.TransactionRepository;
 import org.wallet.walletdata.repositories.UserRepository;
@@ -19,11 +18,13 @@ import org.wallet.walletserver.services.exceptions.InsufficientFundsException;
 
 import java.math.BigDecimal;
 
-import static org.junit.Assert.assertTrue;
 
-@RunWith(SpringRunner.class)
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+@ExtendWith(SpringExtension.class)
 @SpringBootTest
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class IntegrationTests {
 
     @Autowired
@@ -40,8 +41,8 @@ public class IntegrationTests {
     @Autowired
     private TransactionRepository transactionRepository;
 
-    @Before
-    public void setup() {
+    @Test
+    public void integrationTest() {
         User user = new User("testUser");
         user.setId(1L);
 
@@ -51,77 +52,39 @@ public class IntegrationTests {
 
         userRepository.save(user);
         walletRepository.save(testWallet);
+        assertThrows(InsufficientFundsException.class, () -> transactionService.withdrawTransaction(1L, BigDecimal.valueOf(200L), Currency.USD));
 
-    }
-
-    @Test(expected = InsufficientFundsException.class)
-    public void whenTest1WithdrawFromEmptyWallet_thenThrowException() {
-        transactionService.withdrawTransaction(1L, BigDecimal.valueOf(200L), Currency.USD);
-    }
-
-    @Test
-    public void whenTest2DepositToUSDWallet_thenReturnSuccess() {
         transactionService.depositTransaction(1L, BigDecimal.valueOf(100L), Currency.USD);
-    }
-
-    @Test
-    public void whenTest3GetBallance_thenReturn100USD() {
+        //whenTest3GetBallance_thenReturn100USD
         Balance balance = transactionService.getBalance(1L);
         Integer balanceCOmpare = balance.getBalance().get(Currency.USD).compareTo(BigDecimal.valueOf(100L));
         BigDecimal balanceUSD = balance.getBalance().get(Currency.USD);
-        assertTrue(balance.getBalance().get(Currency.USD).compareTo(BigDecimal.valueOf(100L)) == 0);
+        assertEquals(balance.getBalance().get(Currency.USD).compareTo(BigDecimal.valueOf(100L)), 0);
+        //whenTest4WithdrawFromUSD100Wallet_thenThrowException
+        assertThrows(InsufficientFundsException.class, () -> transactionService.withdrawTransaction(1L, BigDecimal.valueOf(200L), Currency.USD));
 
-    }
-
-    @Test(expected = InsufficientFundsException.class)
-    public void whenTest4WithdrawFromUSD100Wallet_thenThrowException() {
-        transactionService.withdrawTransaction(1L, BigDecimal.valueOf(200L), Currency.USD);
-    }
-
-    @Test
-    public void whenTest5DepositAnother100ToEURWallet_thenReturnSuccess() {
         transactionService.depositTransaction(1L, BigDecimal.valueOf(100L), Currency.EUR);
-    }
-
-    @Test
-    public void whenTest6GetBallance_thenReturn100USD100EUR() {
-        Balance balance = transactionService.getBalance(1L);
+        //whenTest6GetBallance_thenReturn100USD100EUR
+        balance = transactionService.getBalance(1L);
         assertTrue(balance.getBalance().get(Currency.USD).compareTo(BigDecimal.valueOf(100L)) == 0);
         assertTrue(balance.getBalance().get(Currency.EUR).compareTo(BigDecimal.valueOf(100L)) == 0);
-    }
+        //whenTest7WithdrawFromUSD100WalletAgain_thenThrowException
+        assertThrows(InsufficientFundsException.class, () -> transactionService.withdrawTransaction(1L, BigDecimal.valueOf(200L), Currency.USD));
 
-    @Test(expected = InsufficientFundsException.class)
-    public void whenTest7WithdrawFromUSD100WalletAgain_thenThrowException() {
-        transactionService.withdrawTransaction(1L, BigDecimal.valueOf(200L), Currency.USD);
-    }
-
-    @Test
-    public void whenTest8DepositAnother100ToUSDWallet_thenReturnSuccess() {
         transactionService.depositTransaction(1L, BigDecimal.valueOf(100L), Currency.USD);
-    }
 
-    @Test
-    public void whenTest90GetBallance_thenReturn200USD100EUR() {
-        Balance balance = transactionService.getBalance(1L);
+        //whenTest90GetBallance_thenReturn200USD100EUR
+        balance = transactionService.getBalance(1L);
         assertTrue(balance.getBalance().get(Currency.USD).compareTo(BigDecimal.valueOf(200L)) == 0);
         assertTrue(balance.getBalance().get(Currency.EUR).compareTo(BigDecimal.valueOf(100L)) == 0);
-    }
 
-    @Test
-    public void whenTest91WithdrawFromUSD200WalletAgain_thenReturnSuccess() {
         transactionService.withdrawTransaction(1L, BigDecimal.valueOf(200L), Currency.USD);
-    }
-
-    @Test
-    public void whenTest92GetBallance_thenReturn0USD100EUR() {
-        Balance balance = transactionService.getBalance(1L);
+        //whenTest92GetBallance_thenReturn0USD100EUR
+        balance = transactionService.getBalance(1L);
         assertTrue(balance.getBalance().get(Currency.USD).compareTo(BigDecimal.ZERO) == 0);
         assertTrue(balance.getBalance().get(Currency.EUR).compareTo(BigDecimal.valueOf(100L)) == 0);
-    }
-
-    @Test(expected = InsufficientFundsException.class)
-    public void whenTest93WithdrawFromUSD200WalletAgain_thenThrowException() {
-        transactionService.withdrawTransaction(1L, BigDecimal.valueOf(200L), Currency.USD);
+        //whenTest93WithdrawFromUSD200WalletAgain_thenThrowException
+        assertThrows(InsufficientFundsException.class, () -> transactionService.withdrawTransaction(1L, BigDecimal.valueOf(200L), Currency.USD));
     }
 
 
